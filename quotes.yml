@@ -1,0 +1,13 @@
+- name: "Elon Musk"
+  quote: "When something is important enough, you do it even if the odds are not in your favor."
+  source: "https://www.linkedin.com/posts/elon-musk"
+  company: "Tesla, SpaceX"
+  company_url: "https://www.tesla.com/"
+  linkedin: "https://www.linkedin.com/in/elonmusk"
+
+- name: "Sam Altman"
+  quote: "Build something people love, and everything else follows."
+  source: "https://www.linkedin.com/posts/sam-altman"
+  company: "OpenAI"
+  company_url: "https://www.openai.com/"
+  linkedin: "https://www.linkedin.com/in/samaltman"

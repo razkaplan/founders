@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Founders Quotes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0077B5;
+            --secondary-color: #f2f2f2;
+            --text-color: #333;
+            --light-text: #666;
+            --accent-color: #00a0dc;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .quote-feed {
+            margin-top: 2rem;
+        }
+
+        .quote-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .quote-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .quote-content {
+            padding: 2rem;
+            position: relative;
+        }
+
+        .quote-text {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            font-style: italic;
+            color: var(--text-color);
+        }
+
+        .quote-text::before {
+            content: """;
+            font-size: 4rem;
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            color: rgba(0, 119, 181, 0.1);
+            font-family: Georgia, serif;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+        }
+
+        .author-details {
+            flex: 1;
+        }
+
+        .author-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .author-name:hover {
+            text-decoration: underline;
+        }
+
+        .company-name {
+            font-size: 0.9rem;
+            color: var(--light-text);
+            margin-top: 0.2rem;
+        }
+
+        .company-link {
+            color: var(--light-text);
+            text-decoration: none;
+        }
+
+        .company-link:hover {
+            color: var(--accent-color);
+        }
+
+        .quote-source {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--light-text);
+        }
+
+        .quote-source a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .quote-source a:hover {
+            text-decoration: underline;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 2rem;
+            color: var(--light-text);
+        }
+
+        .refresh-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: block;
+            margin: 0 auto;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .refresh-button:hover {
+            background-color: #005885;
+        }
+
+        .error-message {
+            background-color: #fff3f3;
+            color: #d32f2f;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            border-left: 4px solid #d32f2f;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            color: var(--light-text);
+            border-top: 1px solid var(--secondary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .quote-text {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Founders Quotes</h1>
+            <p>Wisdom and insights from the world's leading entrepreneurs</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="quote-feed" id="quoteFeed">
+            <!-- Quotes will be dynamically loaded here -->
+            <div class="loader">Loading quotes...</div>
+        </div>
+        <button class="refresh-button" onclick="refreshQuotes()">Refresh Quotes</button>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Founders Quotes | A curated collection of entrepreneurial wisdom</p>
+        </div>
+    </footer>
+
+    <script>
+        // Function to parse YAML
+        function parseYAML(yamlStr) {
+            try {
+                const lines = yamlStr.split('\n');
+                const quotes = [];
+                let currentQuote = null;
+
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    
+                    if (trimmedLine === '-') {
+                        if (currentQuote) {
+                            quotes.push(currentQuote);
+                        }
+                        currentQuote = {};
+                    } else if (trimmedLine.startsWith('-')) {
+                        if (currentQuote) {
+                            quotes.push(currentQuote);
+                        }
+                        currentQuote = {};
+                        
+                        // Check if this line also contains a key-value pair
+                        const keyValueMatch = trimmedLine.substring(1).trim().match(/^(\w+):\s*"(.+)"$/);
+                        if (keyValueMatch) {
+                            currentQuote[keyValueMatch[1]] = keyValueMatch[2];
+                        }
+                    } else if (currentQuote && trimmedLine.includes(':')) {
+                        const [key, ...valueParts] = trimmedLine.split(':');
+                        let value = valueParts.join(':').trim();
+                        
+                        if (value.startsWith('"') && value.endsWith('"')) {
+                            value = value.substring(1, value.length - 1);
+                        }
+                        
+                        currentQuote[key.trim()] = value;
+                    }
+                }
+
+                if (currentQuote) {
+                    quotes.push(currentQuote);
+                }
+
+                return quotes;
+            } catch (error) {
+                console.error('Error parsing YAML:', error);
+                return [];
+            }
+        }
+
+        // Function to render quotes
+        function renderQuotes(quotes) {
+            const quoteFeed = document.getElementById('quoteFeed');
+            quoteFeed.innerHTML = '';
+
+            if (!quotes || quotes.length === 0) {
+                quoteFeed.innerHTML = '<div class="loader">No quotes found. Try adding some!</div>';
+                return;
+            }
+
+            quotes.forEach(quote => {
+                const quoteCard = document.createElement('div');
+                quoteCard.className = 'quote-card';
+
+                // Get initials for avatar
+                const initials = quote.name
+                    ? quote.name
+                          .split(' ')
+                          .map(part => part[0])
+                          .join('')
+                          .substring(0, 2)
+                          .toUpperCase()
+                    : '?';
+
+                quoteCard.innerHTML = `
+                    <div class="quote-content">
+                        <p class="quote-text">${quote.quote}</p>
+                        <div class="author-info">
+                            <div class="author-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="author-details">
+                                <a href="${quote.linkedin || '#'}" class="author-name" target="_blank">
+                                    ${quote.name}
+                                </a>
+                                <p class="company-name">
+                                    ${quote.company ? 
+                                        `<a href="${quote.company_url || '#'}" class="company-link" target="_blank">
+                                            ${quote.company}
+                                        </a>` : ''}
+                                </p>
+                            </div>
+                        </div>
+                        ${quote.source ? 
+                            `<div class="quote-source">
+                                Source: <a href="${quote.source}" target="_blank">LinkedIn Post</a>
+                            </div>` : ''}
+                    </div>
+                `;
+
+                quoteFeed.appendChild(quoteCard);
+            });
+        }
+
+        // Function to load quotes from local YAML file
+        async function loadQuotesFromFile() {
+            try {
+                document.getElementById('quoteFeed').innerHTML = '<div class="loader">Loading quotes...</div>';
+                
+                // Try to load the local quotes.yml file
+                const response = await fetch('quotes.yml');
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load quotes.yml: ${response.status} ${response.statusText}`);
+                }
+                
+                const yamlContent = await response.text();
+                const quotes = parseYAML(yamlContent);
+                renderQuotes(quotes);
+            } catch (error) {
+                console.error('Error loading quotes:', error);
+                document.getElementById('quoteFeed').innerHTML = 
+                    `<div class="error-message">
+                        <h3>Error loading quotes</h3>
+                        <p>${error.message}</p>
+                        <p>Make sure quotes.yml exists in the same folder as this HTML file.</p>
+                        <p>If this is your first time using the extension, you may need to create an initial quotes.yml file with example content.</p>
+                     </div>
+                     <div class="loader">
+                        <p>Example content for quotes.yml:</p>
+                        <pre>- name: "Elon Musk"
+  quote: "When something is important enough, you do it even if the odds are not in your favor."
+  source: "https://www.linkedin.com/posts/elon-musk"
+  company: "Tesla, SpaceX"
+  company_url: "https://www.tesla.com/"
+  linkedin: "https://www.linkedin.com/in/elonmusk"</pre>
+                     </div>`;
+            }
+        }
+
+        // Function to refresh quotes
+        function refreshQuotes() {
+            loadQuotesFromFile();
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', loadQuotesFromFile);
+    </script>
+</body>
+</html>
