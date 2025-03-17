@@ -3,64 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quotes</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
-        #quotes-container {
-            margin-top: 20px;
-        }
-        .quote {
-            background: white;
-            padding: 15px;
-            margin: 10px auto;
-            width: 60%;
-            border-left: 5px solid #007BFF;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-    <script>
-        async function loadQuotes() {
-            try {
-                const response = await fetch(/Users/razkaplan/Documents/GitHub/founders/quotes.yml);
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                const text = await response.text();
-                
-                const quotes = jsyaml.load(text);
-                if (!Array.isArray(quotes)) throw new Error("Invalid YAML format");
-                
-                displayQuotes(quotes);
-            } catch (error) {
-                console.error("Error loading quotes:", error);
-                document.getElementById("quotes-container").innerHTML = "Failed to load quotes.";
-            }
-        }
-
-        function displayQuotes(quotes) {
-            const container = document.getElementById("quotes-container");
-            container.innerHTML = "";
-            quotes.forEach(quote => {
-                if (!quote.text || !quote.author) return;
-                const quoteDiv = document.createElement("div");
-                quoteDiv.classList.add("quote");
-                quoteDiv.innerHTML = `<p>"${quote.text}" - <strong>${quote.author}</strong></p>`;
-                container.appendChild(quoteDiv);
-            });
-        }
-
-        window.onload = loadQuotes;
-    </script>
-</head>
 <body>
-    <h1>Quotes</h1>
-    <div id="quotes-container">Loading...</div>
+    <header>Founders Quotes</header>
+    <div class="container">
+        <div class="quote-feed" id="quoteFeed"></div>
+        <div class="tag-cloud" id="tagCloud"><strong>Topics:</strong></div>
+    </div>
+    <script>
+        function renderQuotes() {
+            const quotes = [
+                { quote: "Innovation distinguishes between a leader and a follower.", name: "Steve Jobs", company: "Apple" },
+                { quote: "Success is not in what you have, but who you are.", name: "", company: "" },
+            ];
+
+            const quoteFeed = document.getElementById('quoteFeed');
+            quoteFeed.innerHTML = '';
+
+            quotes.forEach(quote => {
+                const quoteCard = document.createElement('div');
+                quoteCard.className = 'quote-card';
+                
+                const authorName = quote.name ? quote.name : '****';
+                const companyName = quote.company ? quote.company : '****';
+                
+                quoteCard.innerHTML = `
+                    <p class="quote-text">“${quote.quote}”</p>
+                    <div class="author-info">
+                        <div class="author-avatar">${authorName.charAt(0)}</div>
+                        <div>
+                            <strong>${authorName}</strong><br>
+                            <span>${companyName}</span>
+                        </div>
+                        ${!quote.name || !quote.company ? '<button class="claim-button">Claim Quote</button>' : ''}
+                    </div>
+                `;
+                
+                quoteFeed.appendChild(quoteCard);
+            });
+
+            renderTags();
+        }
+
+        function renderTags() {
+            const tags = ["Leadership", "Innovation", "Success", "Entrepreneurship"];
+            const tagCloud = document.getElementById('tagCloud');
+            tagCloud.innerHTML = '<strong>Topics:</strong> ' + tags.map(tag => `<span>${tag}</span>`).join(' ');
+        }
+
+        renderQuotes();
+    </script>
 </body>
 </html>
